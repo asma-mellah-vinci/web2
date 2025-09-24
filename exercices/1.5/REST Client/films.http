@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:3000
+
+### GET ALL FILMS
+GET {{baseUrl}}/films
+
+### GET ALL FILMS AVEC FILTRE 
+GET {{baseUrl}}/films?minimum-duration=120
+
+### GET BY ID
+GET {{baseUrl}}/films/2
+
+### Lire un film qui n'existe pas (test erreur 404)
+GET {{baseUrl}}/films/999
+
+### Créer un nouveau film
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+  "title": "Dune",
+  "director": "Denis Villeneuve",
+  "duration": 155,
+  "budget": 165,
+  "imageUrl": "https://example.com/dune.jpg"
+}
+
+### Créer un film avec erreur (duration = 0)
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+  "title": "Bad",
+  "director": "Nobody",
+  "duration": 0
+}
+
+
+### Créer un film avec erreur 409
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+  "title": "The Social Network",
+  "director": "David Fincher",
+  "duration": 120
+}
