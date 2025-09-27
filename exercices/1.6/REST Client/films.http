@@ -1,0 +1,111 @@
+@baseUrl = http://localhost:3000
+
+### GET ALL FILMS
+GET {{baseUrl}}/films
+
+### GET ALL FILMS AVEC FILTRE 
+GET {{baseUrl}}/films?minimum-duration=120
+
+### GET BY ID
+GET {{baseUrl}}/films/2
+
+### Lire un film qui n'existe pas (test erreur 404)
+GET {{baseUrl}}/films/999
+
+### Créer un nouveau film
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+  "title": "Dune",
+  "director": "Denis Villeneuve",
+  "duration": 155,
+  "budget": 165,
+  "imageUrl": "https://example.com/dune.jpg"
+}
+
+### Créer un film avec erreur (duration = 0)
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+  "title": "Bad",
+  "director": "Nobody",
+  "duration": 0
+}
+
+
+### Créer un film avec erreur 409
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+  "title": "The Social Network",
+  "director": "David Fincher",
+  "duration": 120
+}
+
+
+### DELETE ok
+DELETE {{baseUrl}}/films/3
+
+
+### DELETE wrong id
+DELETE {{baseUrl}}/films/0
+
+### DELETE not found
+DELETE {{baseUrl}}/films/999
+
+### PATCH ok (maj partielle)
+PATCH {{baseUrl}}/films/1
+Content-Type: application/json
+
+{
+  "duration": 170,
+  "budget": 170
+}
+
+### PATCH wrong id
+PATCH {{baseUrl}}/films/0
+Content-Type: application/json
+
+{
+  "duration": 150
+}
+
+### PATCH invalid duration
+PATCH {{baseUrl}}/films/1
+Content-Type: application/json
+
+{
+  "duration": 0
+}
+
+### PUT replace (id existe)
+PUT {{baseUrl}}/films/3
+Content-Type: application/json
+
+{
+  "title": "The Social Network (Director's Cut)",
+  "director": "David Fincher",
+  "duration": 122,
+  "budget": 45
+}
+
+### PUT create (id n'existe pas → crée)
+PUT {{baseUrl}}/films/10
+Content-Type: application/json
+
+{
+  "title": "New Film",
+  "director": "New Director",
+  "duration": 100
+}
+
+### PUT missing required fields (400)
+PUT {{baseUrl}}/films/11
+Content-Type: application/json
+
+{
+  "title": "Missing Stuff"
+}
