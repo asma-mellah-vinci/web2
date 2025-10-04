@@ -1,0 +1,10 @@
+@baseUrl = http://localhost:3000
+
+### Read all drinks
+GET {{baseUrl}}/drinks
+
+### Read a single drink
+GET {{baseUrl}}/drinks/2
+
+### Trigger error (option)
+GET {{baseUrl}}/drinks/error/test
