@@ -1,0 +1,38 @@
+### 🔹 Lire tous les textes
+GET http://localhost:3000/texts
+Content-Type: application/json
+
+
+### 🔹 Lire les textes filtrés par niveau
+GET http://localhost:3000/texts?level=easy
+Content-Type: application/json
+
+
+### 🔹 Lire un texte précis par id
+GET http://localhost:3000/texts/4c15afd3-6eb4-4a1c-af76-bae537039209
+Content-Type: application/json
+
+
+### 🔹 Ajouter un texte
+POST http://localhost:3000/texts
+Content-Type: application/json
+
+{
+  "content": "Typing every morning keeps your mind sharp.",
+  "level": "easy"
+}
+
+
+### 🔹 Supprimer un texte
+DELETE http://localhost:3000/texts/fe656196-b202-40b2-920b-301a61dd7350
+Content-Type: application/json
+
+
+### 🔹 Remplacer un texte
+PUT http://localhost:3000/texts/729167ad-2e81-4399-93f4-cc9ec743dee8
+Content-Type: application/json
+
+{
+  "content": "Programming builds logic and patience.",
+  "level": "hard"
+}
