@@ -3,21 +3,21 @@ interface PageTitleProps {
 }
 
 interface Movie {
-  title : string;
+  title: string;
   director: string;
 }
 
 interface CinemaProps {
   name: string;
-  movie1 : Movie;
-  movie2 : Movie;
+  movie1: Movie;
+  movie2: Movie;
 }
 
 const PageTitle = (props: PageTitleProps) => {
   return <h1>{props.title}</h1>;
 };
 
-const Cinema = ({name , movie1 , movie2} : CinemaProps) => {
+const Cinema = ({ name, movie1, movie2 }: CinemaProps) => {
   return (
     <div>
       <h2>{name}</h2>
@@ -32,7 +32,6 @@ const Cinema = ({name , movie1 , movie2} : CinemaProps) => {
     </div>
   );
 };
-
 
 const App = () => {
   const pageTitle = "Informations sur les films dans les cinémas";
@@ -68,6 +67,5 @@ const App = () => {
     </div>
   );
 };
-
 
 export default App;
