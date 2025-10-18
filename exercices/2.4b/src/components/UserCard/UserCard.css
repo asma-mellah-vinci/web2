@@ -1,0 +1,20 @@
+.user-card {
+  border: 1px solid #ccc;                  /* Bordure grise claire autour de la carte */
+  border-radius: 10px;                     /* Coins arrondis */
+  padding: 15px;                           /* Espace intérieur (respiration du contenu) */
+  margin: 10px;                            /* Espace entre chaque carte */
+  width: 200px;                            /* Largeur fixe pour chaque carte */
+  text-align: center;                      /* Centrer le texte horizontalement */
+  font-family: Arial, sans-serif;           /* Police du texte */
+  background-color: #fff;                  /* Fond blanc pour la carte */
+}
+
+.online p:last-child {
+    color: green; /* text en vert */
+    font-weight: bold; /*text en gras */
+}
+
+.offline p:last-child {
+    color: red;
+    font-weight: bold;
+}
