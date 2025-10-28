@@ -20,8 +20,7 @@ const Cinema = ({name , movies} : CinemaProps) => {
           <li key={index}>
             <MovieItem title={movie.title}
                         director={movie.director}
-                        description={movie.description}
-        />
+                        description={movie.description}/>
           </li>
         ))}
       </ul>
