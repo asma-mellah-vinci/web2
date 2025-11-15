@@ -1,0 +1,20 @@
+import { useOutletContext } from "react-router-dom";
+import PageTitle from "../PageTitle";
+import AddMovieForm from "../AddMovieForm";
+import { MovieContext } from "../../types";
+
+const AddMoviePage = () => {
+    const { onMovieAdded } : MovieContext = useOutletContext();
+    return (
+        <div>
+            <PageTitle title="Add a movie" />
+            <AddMovieForm onMovieAdded={onMovieAdded}/>
+            <br/>
+            <br />
+            <br />
+            <br />
+        </div>
+    );
+};
+
+export default AddMoviePage;
