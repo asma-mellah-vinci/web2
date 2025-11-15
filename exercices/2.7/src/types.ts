@@ -1,11 +1,10 @@
 interface Movie {
-  id           : number;
-  title        : string;
-  director     : string;
-  duration     : number;
-  image?       : string;        // facultatif
-  description? : string;        // facultatif
-  budget?      : number;       // facultatif
+  title: string;
+  director: string;
+  duration: number;
+  imageUrl?: string;
+  description?: string;
+  budget?: number;
 }
 
 export type { Movie };

@@ -1,26 +1,26 @@
 import { useState } from "react";
+import "./ColorBox.css";
 
+const colors = ["red", "green", "blue", "yellow", "purple"];
 
 const ColorBox = () => {
-    const colors = ["red","green","blue","yellow","violet"];
-    const [index, setIndex] = useState(0);
+  const [currentColorIndex, setCurrentColorIndex] = useState(0);
 
-
-    const handleClick = () => {
-        setIndex((prev) => (prev + 1) % colors.length);
-    };
-
-
-    return (
-        <div style={{
-            backgroundColor : colors[index]
-        }}>
-            <button onClick={handleClick}>
-                {colors[(index + 1) % colors.length]}
-            </button>
-            <p>{colors[index]}</p>
-        </div>
-    );
+  return (
+    <div
+      className="color-box"
+      style={{ backgroundColor: colors[currentColorIndex] }}
+    >
+      <button className="color-box__button"
+        onClick={() => {
+          setCurrentColorIndex((currentColorIndex + 1) % colors.length);
+        }}
+      >
+        {colors[(currentColorIndex + 1) % colors.length]}
+      </button>
+      <h3>{colors[currentColorIndex]}</h3>
+    </div>
+  );
 };
 
 export default ColorBox;
