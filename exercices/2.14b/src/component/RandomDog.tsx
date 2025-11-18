@@ -11,10 +11,14 @@ interface dog {
 const RandomDog = () => {
     const [dog , setDog] = useState<dog | undefined>(undefined);
 
-
-
     useEffect(() => {
-        fetchRandomDog();
+
+        const interval = setInterval(async () => {
+            fetchRandomDog();
+        } , 5000);
+
+        return () => clearInterval(interval);
+        
     } , []);
 
     const fetchRandomDog = async () => {
