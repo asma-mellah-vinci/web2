@@ -1,180 +1,211 @@
 import { Router } from "express";
-import {createOneFilm, deleteOneFilm, readAllFilms, readOneFilm, replaceOneFilm, updateOneFilm} from "../services/films"
-import { FilmToUpdate, NewFilm } from "../types";
 
+import { NewFilm } from "../types";
+
+import { containsOnlyExpectedKeys } from "../utils/validate";
+
+import {
+  createOne,
+  deleteOne,
+  readAll,
+  readOne,
+  updateOne,
+  updateOrCreateOne,
+} from "../services/films";
 
 const router = Router();
 
+const expectedKeys = [
+  "title",
+  "director",
+  "duration",
+  "budget",
+  "description",
+  "imageUrl",
+];
 
-// GET ALL
-router.get("/", (req , res) => {
-  const request = req.query["minimum-duration"];
+// Read all films, filtered by minimum-duration if the query param exists
+router.get("/", (req, res) => {
+  const minDuration =
+    "minimum-duration" in req.query
+      ? Number(req.query["minimum-duration"])
+      : undefined;
 
-  if(request !== undefined){
-    const minDuration = Number(request);
-    if(isNaN(minDuration) || minDuration <= 0){
-      return res.status(400).json({error : "Wrong minimum duration"});
-    }
-    return res.status(200).json(readAllFilms(minDuration));
+  if (minDuration !== undefined && (isNaN(minDuration) || minDuration <= 0)) {
+    return res.sendStatus(400);
   }
 
+  const filteredFilms = readAll(minDuration);
 
-  return res.status(200).json(readAllFilms());
+  return res.send(filteredFilms);
 });
 
-
-// GET BY ID
-router.get("/:id" , (req , res ) => {
+// Read a film by id
+router.get("/:id", (req, res) => {
   const id = Number(req.params.id);
-  if(isNaN(id) || id <= 0){
-    return res.status(400).json({ error : "Wrong id"});
+
+  if (isNaN(id)) {
+    return res.sendStatus(400);
   }
 
-  const  film = readOneFilm(id);
+  const film = readOne(id);
 
-  if(!film){
-    return res.status(404).json({ error : "Film not found"});
+  if (film === undefined) {
+    return res.sendStatus(404);
   }
 
-  return res.status(200).json(film);
+  return res.send(film);
 });
 
-// POST
-router.post("/" , (req , res ) => {
-  const body = req.body;
+// Create a new film
+router.post("/", (req, res) => {
+  const body: unknown = req.body;
 
-  if(!body || !body.title || !body.director || typeof body.duration !== "number"){
-       return res.status(400).json({ error: "Missing required fields" });
+  if (
+    !body ||
+    typeof body !== "object" ||
+    !("title" in body) ||
+    !("director" in body) ||
+    !("duration" in body) ||
+    typeof body.title !== "string" ||
+    typeof body.director !== "string" ||
+    typeof body.duration !== "number" ||
+    !body.title.trim() ||
+    !body.director.trim() ||
+    body.duration <= 0 ||
+    ("budget" in body &&
+      (typeof body.budget !== "number" || body.budget <= 0)) ||
+    ("description" in body &&
+      (typeof body.description !== "string" || !body.description.trim())) ||
+    ("imageUrl" in body &&
+      (typeof body.imageUrl !== "string" || !body.imageUrl.trim()))
+  ) {
+    return res.sendStatus(400);
   }
 
-   if(body.duration <= 0){
-     return res.status(400).json({ error: "Invalid duration" });
+  // Challenge of ex1.4 : To be complete, we should check that the keys of the body object are only the ones we expect
+  if (!containsOnlyExpectedKeys(body, expectedKeys)) {
+    return res.sendStatus(400);
+  }
+  // End of challenge
+
+  const newFilm = body as NewFilm;
+
+  const addedFilm = createOne(newFilm);
+
+  if (!addedFilm) {
+    return res.sendStatus(409);
   }
 
-  if(body.budget != undefined && body.budget <= 0){
-     return res.status(400).json({ error: "Invalid budget" });
-  }
-
-const newFilm = createOneFilm({
-    title : body.title,
-    director : body.director,
-    duration : body.duration,
-    budget : body.budget,
-    description : body.description,
-    imageUrl : body.imageUrl,
-  });
-
-  return res.status(201).json(newFilm);
+  return res.json(addedFilm);
 });
 
-
-
+// Delete a film by id
 router.delete("/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  if (isNaN(id) || id <= 0) {
-    return res.status(400).json({ error: "Wrong id" });
+  if (isNaN(id)) {
+    return res.sendStatus(400);
   }
 
-  const deletedFilm = deleteOneFilm(id);
+  const deletedFilm = deleteOne(id);
 
   if (!deletedFilm) {
-    return res.status(404).json({ error: "Film not found" });
+    return res.sendStatus(404);
   }
 
-  return res.status(200).json(deletedFilm);
+  return res.send(deletedFilm);
 });
 
-router.patch("/:id", (req , res) => {
+// Update on or multiple props of a film
+router.patch("/:id", (req, res) => {
   const id = Number(req.params.id);
-  const body = req.body as FilmToUpdate;
 
-  if(isNaN(id) || id <= 0){
-    return res.status(400).json({error : "Wrong id"});
+  if (isNaN(id)) {
+    return res.sendStatus(400);
   }
 
-  if (!body || typeof body !== "object") {
-    return res.status(400).json({ error: "Invalid body" });
+  const body: unknown = req.body;
+
+  if (
+    !body ||
+    typeof body !== "object" ||
+    Object.keys(body).length === 0 ||
+    ("title" in body &&
+      (typeof body.title !== "string" || !body.title.trim())) ||
+    ("director" in body &&
+      (typeof body.director !== "string" || !body.director.trim())) ||
+    ("duration" in body &&
+      (typeof body.duration !== "number" || body.duration <= 0)) ||
+    ("budget" in body &&
+      (typeof body.budget !== "number" || body.budget <= 0)) ||
+    ("description" in body &&
+      (typeof body.description !== "string" || !body.description.trim())) ||
+    ("imageUrl" in body &&
+      (typeof body.imageUrl !== "string" || !body.imageUrl.trim()))
+  ) {
+    return res.sendStatus(400);
   }
 
-   if (body.title !== undefined && (typeof body.title !== "string" || !body.title.trim())) {
-    return res.status(400).json({ error: "Invalid title" });
+  // Challenge of ex1.6 : To be complete, we should check that the keys of the body object are only the ones we expect
+  if (!containsOnlyExpectedKeys(body, expectedKeys)) {
+    return res.sendStatus(400);
   }
+  // End of challenge
 
-  if (body.director !== undefined && (typeof body.director !== "string" || !body.director.trim())) {
-    return res.status(400).json({ error: "Invalid director" });
-  }
-
-  if (body.duration !== undefined && (typeof body.duration !== "number" || body.duration <= 0)) {
-    return res.status(400).json({ error: "Invalid duration" });
-  }
-
-  if (body.budget !== undefined && (typeof body.budget !== "number" || body.budget <= 0)) {
-    return res.status(400).json({ error: "Invalid budget" });
-  }
-
-  const updatedFilm = updateOneFilm(id, body);
+  const updatedFilm = updateOne(id, body);
 
   if (!updatedFilm) {
-    return res.status(404).json({ error: "Film not found" });
+    return res.sendStatus(404);
   }
 
-  return res.status(200).json(updatedFilm);
-
+  return res.send(updatedFilm);
 });
 
-
+// Update a film only if all properties are given or create it if it does not exist and the id is not existant
 router.put("/:id", (req, res) => {
+  const body: unknown = req.body;
+
+  if (
+    !body ||
+    typeof body !== "object" ||
+    !("title" in body) ||
+    !("director" in body) ||
+    !("duration" in body) ||
+    typeof body.title !== "string" ||
+    typeof body.director !== "string" ||
+    typeof body.duration !== "number" ||
+    !body.title.trim() ||
+    !body.director.trim() ||
+    body.duration <= 0 ||
+    ("budget" in body &&
+      (typeof body.budget !== "number" || body.budget <= 0)) ||
+    ("description" in body &&
+      (typeof body.description !== "string" || !body.description.trim())) ||
+    ("imageUrl" in body &&
+      (typeof body.imageUrl !== "string" || !body.imageUrl.trim()))
+  ) {
+    return res.sendStatus(400);
+  }
+
+  // Challenge of ex1.6 : To be complete, we should check that the keys of the body object are only the ones we expect
+  if (!containsOnlyExpectedKeys(body, expectedKeys)) {
+    return res.sendStatus(400);
+  }
+
   const id = Number(req.params.id);
-  const body = req.body as NewFilm;
 
-  // Vérification de l'id
-  if (isNaN(id) || id <= 0) {
-    return res.status(400).json({ error: "Wrong id" });
+  if (isNaN(id)) {
+    return res.sendStatus(400);
   }
 
-  // Vérification des champs obligatoires
-  if (!body || !body.title || !body.director || typeof body.duration !== "number") {
-    return res.status(400).json({ error: "Missing required fields" });
+  const createdOrUpdatedFilm = updateOrCreateOne(id, body as NewFilm);
+
+  if (!createdOrUpdatedFilm) {
+    return res.sendStatus(409); // Film already exists
   }
 
-  // Validation du contenu des champs
-  if (typeof body.title !== "string" || body.title.trim() === "") {
-    return res.status(400).json({ error: "Invalid title" });
-  }
-
-  if (typeof body.director !== "string" || body.director.trim() === "") {
-    return res.status(400).json({ error: "Invalid director" });
-  }
-
-  if (body.duration <= 0) {
-    return res.status(400).json({ error: "Invalid duration" });
-  }
-
-  if (body.budget !== undefined && (typeof body.budget !== "number" || body.budget <= 0)) {
-    return res.status(400).json({ error: "Invalid budget" });
-  }
-
-  const replacedFilm = replaceOneFilm(id, {
-    title: body.title,
-    director: body.director,
-    duration: body.duration,
-    budget: body.budget,
-    description: body.description,
-    imageUrl: body.imageUrl,
-  });
-
-  let status: number;
-  const existing = readOneFilm(id);
-  if (existing) {
-    status = 200;
-  } else {
-    status = 201;
-  }
-
-  return res.status(status).json(replacedFilm);
+  return res.send(createdOrUpdatedFilm);
 });
-
-
 
 export default router;

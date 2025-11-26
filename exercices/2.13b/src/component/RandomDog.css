@@ -1,0 +1,5 @@
+.random-dog {
+    width: 300px; /*largeur*/
+    height: 300px; /*hauteur*/
+    border-radius: 10px; /*coin arrondis*/
+}

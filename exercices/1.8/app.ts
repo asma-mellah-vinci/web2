@@ -1,26 +1,26 @@
-import express, { ErrorRequestHandler } from "express";
-import filmsRouter from "./routes/films";
+import express from "express";
+
+import pizzaRouter from "./routes/films";
+import { requestCounterMiddleware } from "./utils/counter";
 
 const app = express();
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// on cree une variable qui commence a 0
-let getCounter = 0;
-
-app.use((req , _res, next) => {
-  if(req.method === "GET"){
-    getCounter = getCounter + 1;
-    console.log("GET counter :", getCounter);
+/* Middleware to count the number of GET requests */
+let requestCount = 0;
+app.use((req, _res, next) => {
+  if (req.method === "GET") {
+    requestCount++;
+    console.log(`GET counter : ${requestCount}`);
   }
   next();
 });
 
-app.use("/films", filmsRouter);
+/* Challenge of ex1.2 */
+app.use(requestCounterMiddleware);
 
-const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  console.error(err.stack);
-  return res.status(500).send("Something broke!");
-};
-app.use(errorHandler);
+app.use("/films", pizzaRouter);
 
 export default app;

@@ -6,6 +6,7 @@ interface Joke {
 }
 
 
+
 const App = () => {
   const [joke , setJoke] = useState<Joke | undefined>(undefined);
 

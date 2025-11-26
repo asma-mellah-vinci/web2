@@ -1,10 +1,10 @@
 import express, { ErrorRequestHandler } from "express";
 import cors from "cors";
 
-import usersRouter from "./routes/users";
-import pizzaRouter from "./routes/pizzas";
-import drinkRouter from "./routes/drinks";
+
 import authsRouter from "./routes/auths";
+import filmsRouter from "./routes/films";
+// import commentsRouter from "./routes/comments"
 
 
 const app = express();
@@ -26,10 +26,10 @@ app.use((_req, _res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/users", usersRouter);
-app.use("/pizzas", pizzaRouter);
-app.use("/drinks", drinkRouter);
+
 app.use("/auths", authsRouter);
+app.use("/films", filmsRouter);
+// app.use("/comments",commentsRouter);
 
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
